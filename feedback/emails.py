@@ -5,7 +5,7 @@ from django.template.loader import render_to_string
 
 
 def send_feedback_email(email, message):
-    c = Context({'email': email, 'message': message})
+    c = {'email': email, 'message': message}
 
     email_subject = render_to_string(
         'feedback/email/feedback_email_subject.txt', c).replace('\n', '')

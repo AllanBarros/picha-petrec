@@ -1,11 +1,11 @@
-from django.conf.urls import include, url
-from django.contrib import admin
+from django.urls import path
 
-from photos.views import PhotoView
+from photos.views import PhotosView, PhotosCountView
 from feedback.views import FeedbackView
 
 urlpatterns = [
-    url(r'^$', PhotoView.as_view(), name="home"),
-    url(r'^feedback/$', FeedbackView.as_view(), name="feedback"),
-    url(r'^admin/', include(admin.site.urls)),
+    path('feedback/', FeedbackView.as_view(), name="feedback"),
+    path('photos/', PhotosView.as_view(), name="photos"),
+    path('photos-count/', PhotosCountView.as_view(), name="photos-count"),
+
 ]

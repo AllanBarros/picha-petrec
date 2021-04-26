@@ -1,15 +1,23 @@
-from django.views.generic.list import ListView
+from rest_framework import generics, permissions
+from .models import Photo
+from django.db.models import Count
+from picha.serializers import PhotoSerializer
+from rest_framework.renderers import JSONRenderer
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
-from photos.models import Photo
-from feedback.forms import FeedbackForm
+class PhotosView(generics.ListCreateAPIView):
+    queryset           = Photo.objects.all()
+    serializer_class   = PhotoSerializer
+    permission_classes = [permissions.AllowAny]
 
 
-class PhotoView(ListView):
-    model = Photo
-    template_name = 'photos/photo_list.html'
-    paginate_by = 24
+class PhotosCountView(APIView):
+    permission_classes = [permissions.AllowAny]
+    renderer_classes = [JSONRenderer]
 
-    def get_context_data(self, **kwargs):
-        context = super(PhotoView, self).get_context_data(**kwargs)
-        context['form'] = FeedbackForm()
-        return context
+    def get(self, request):
+        
+        content = {'Photos': 'Photos', 'Total':Photo.objects.all().count()}
+
+        return Response(content)
