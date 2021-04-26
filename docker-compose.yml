@@ -1,18 +1,21 @@
 version: "3.9"
    
 services:
-  redis:
-    image: redis:latest
-    command: ["redis-server", "--bind", "redis", "--port", "6379"]
   db:
     image: postgres
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+
+  redis:
+    image: redis:latest
+    command: ["redis-server", "--bind", "redis", "--port", "6379"]
+
   backend:
     build: .
-    command: sh -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
+    command: python manage.py runserver 0.0.0.0:8000
+    entrypoint: /entrypoint.sh
     volumes:
       - .:/Picha
     ports:
@@ -21,18 +24,7 @@ services:
     depends_on:
       - db
       - redis
-  frontend:
-    build:
-      context: frontend
-      dockerfile: Dockerfile
-    command: sh -c "cd ./picha-frontend && npm install && npm start"
-    volumes:
-      - .:/Picha/frontend/
-    ports:
-      - "3000:3000"
-    depends_on:
-      - db
-      - backend
+
   worker:
     build: .
     command: 'celery -A picha worker -l info'
@@ -48,4 +40,18 @@ services:
         - .:/Picha
       depends_on:
         - redis
+        - worker
         - db  
+
+  frontend:
+        build:
+          context: frontend
+          dockerfile: Dockerfile
+        command: sh -c "cd ./picha-frontend && npm install && npm start"
+        volumes:
+          - .:/Picha/frontend/
+        ports:
+            - "3000:3000"
+        depends_on:
+          - db
+          - backend
