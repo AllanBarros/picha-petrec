@@ -14,8 +14,8 @@ services:
 
   backend:
     build: .
-    command: 'python manage.py runserver 0.0.0.0:8000'
-    entrypoint: /entrypoint.sh
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; python manage.py migrate; python manage.py runserver 0.0.0.0:8000'
+
     volumes:
       - .:/Picha
     ports:
@@ -27,7 +27,7 @@ services:
 
   worker:
     build: .
-    command: 'celery -A picha worker -l info'
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; celery -A picha worker -l info'
     volumes: 
       - .:/Picha
     depends_on: 
@@ -36,7 +36,7 @@ services:
       - backend
   beat:
       build: .  
-      command: 'celery -A picha beat -l info'
+      command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; celery -A picha beat -l info'
       volumes: 
         - .:/Picha
       depends_on:
