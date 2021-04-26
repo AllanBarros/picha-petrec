@@ -1,6 +1,6 @@
 FROM python:3
 ENV PYTHONUNBUFFERED=1
-WORKDIR /Picha
-COPY requirements.txt /Picha/
+WORKDIR /picha-petrec
+COPY requirements.txt /picha-petrec/
 RUN pip install -r requirements.txt
-COPY . /Picha/
+COPY . /picha-petrec/
